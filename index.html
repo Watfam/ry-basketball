@@ -1,0 +1,2181 @@
+<title>Run The Play</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Karla:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111c2e;
+    --ink-soft:#5b6779;
+    --paper:#eceef1;
+    --paper-2:#dfe2e7;
+    --paper-3:#cdd2d9;
+    --line:#b9c0c9;
+    --court:#1f3f66;
+    --court-2:#3d6ea3;
+    --court-ink:#f4f7fa;
+    --focus:#5c6b80;
+    --success:#3f7d5c;
+    --success-bg:#dce9e2;
+    --warn:#a3432e;
+    --shadow: 0 1px 0 rgba(17,28,46,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#e7ebf0;
+      --ink-soft:#9aa7b8;
+      --paper:#0d1622;
+      --paper-2:#15202e;
+      --paper-3:#1e2c3d;
+      --line:#2c3b4e;
+      --court:#5f93c9;
+      --court-2:#8bb4dd;
+      --court-ink:#0b1523;
+      --focus:#8b98a9;
+      --success:#7fae95;
+      --success-bg:#1c2c26;
+      --warn:#d1795f;
+      --shadow: 0 1px 0 rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#e7ebf0;
+    --ink-soft:#9aa7b8;
+    --paper:#0d1622;
+    --paper-2:#15202e;
+    --paper-3:#1e2c3d;
+    --line:#2c3b4e;
+    --court:#5f93c9;
+    --court-2:#8bb4dd;
+    --court-ink:#0b1523;
+    --focus:#8b98a9;
+    --success:#7fae95;
+    --success-bg:#1c2c26;
+    --warn:#d1795f;
+    --shadow: 0 1px 0 rgba(0,0,0,0.4);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Karla',system-ui,-apple-system,sans-serif;
+    padding-inline:20px;
+    padding-block:28px 60px;
+  }
+  h1,h2,h3{font-family:'Oswald',system-ui,sans-serif; text-transform:uppercase; letter-spacing:0.02em; text-wrap:balance; margin:0;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+
+  .wrap{max-width:640px; margin:0 auto; display:flex; flex-direction:column; gap:28px;}
+
+  /* ---- Header ---- */
+  .masthead{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; border-bottom:3px solid var(--ink); padding-bottom:14px;}
+  .masthead .title{font-size:clamp(1.6rem, 5vw, 2.1rem); font-weight:700; color:var(--ink); display:flex; align-items:center; gap:10px;}
+  .masthead .title .ball{width:0.95em; height:0.95em; flex:none; display:block;}
+  .masthead .tagline{font-size:0.8rem; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:0.08em;}
+
+  /* ---- Profile bar ---- */
+  .profile-bar{display:flex; align-items:center; gap:10px; font-size:0.85rem; color:var(--ink-soft);}
+  .profile-bar select{
+    font-family:'Karla',sans-serif; font-size:0.85rem; font-weight:600; color:var(--ink);
+    padding:6px 10px; border-radius:8px; border:1.5px solid var(--line); background:var(--paper);
+  }
+  .profile-bar select:focus-visible{outline:2px solid var(--focus); outline-offset:1px;}
+  .profile-bar .btn-add-profile{
+    background:none; border:1.5px solid var(--line); color:var(--ink-soft);
+    border-radius:8px; font-size:0.8rem; font-weight:600; padding:5px 10px; cursor:pointer;
+  }
+  .profile-bar .btn-add-profile:hover{color:var(--ink); border-color:var(--ink-soft);}
+  .profile-bar .profile-current b{color:var(--ink);}
+  #appBody{display:flex; flex-direction:column; gap:28px;}
+
+  /* ---- Profile picker (home screen) ---- */
+  .profile-grid{display:flex; flex-direction:column; gap:10px; margin-bottom:14px;}
+  .profile-card-row{display:flex; gap:8px; align-items:stretch;}
+  .profile-card{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:14px 16px; border:1.5px solid var(--line); border-radius:10px;
+    background:var(--paper); cursor:pointer; width:100%; text-align:left; flex:1; min-width:0;
+    font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.03em;
+    font-weight:600; font-size:0.95rem; color:var(--ink);
+  }
+  .profile-card:hover{border-color:var(--court);}
+  .profile-card:focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+  .profile-card.active{border-color:var(--court); background:var(--court); color:var(--court-ink);}
+  .profile-card .pc-meta{
+    font-family:'JetBrains Mono',monospace; text-transform:none; letter-spacing:0;
+    font-size:0.72rem; font-weight:600; opacity:0.75;
+  }
+  .profile-card-add{border-style:dashed; justify-content:center; color:var(--ink-soft);}
+  .profile-edit-btn{
+    flex:none; border:1.5px solid var(--line); background:var(--paper); color:var(--ink-soft);
+    border-radius:8px; padding:0 14px; font-size:0.75rem; font-weight:600; cursor:pointer;
+    text-transform:uppercase; letter-spacing:0.03em; font-family:'Oswald',sans-serif;
+  }
+  .profile-edit-btn:hover{color:var(--ink); border-color:var(--ink-soft);}
+  .profile-rename-form{display:flex; gap:8px; flex:1;}
+  .profile-rename-form input[type="text"]{
+    flex:1; min-width:0; font-family:'Karla',sans-serif; font-size:0.9rem;
+    padding:10px 12px; border-radius:8px; border:1.5px solid var(--line);
+    background:var(--paper); color:var(--ink);
+  }
+  .profile-rename-form input:focus-visible{outline:2px solid var(--focus); outline-offset:1px;}
+  .add-profile-form{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  .add-profile-form input[type="text"]{
+    flex:1; min-width:150px; font-family:'Karla',sans-serif; font-size:0.9rem;
+    padding:10px 12px; border-radius:8px; border:1.5px solid var(--line);
+    background:var(--paper); color:var(--ink);
+  }
+  .add-profile-form input:focus-visible{outline:2px solid var(--focus); outline-offset:1px;}
+  .add-profile-actions{display:flex; gap:8px;}
+
+  /* ---- Panels ---- */
+  .panel{background:var(--paper-2); border:1px solid var(--line); border-radius:10px; padding:18px 18px 20px;}
+  .panel + .panel{margin-top:0;}
+  .panel-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:14px;}
+  .panel-head h2{font-size:1.05rem;}
+  .step-num{font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--court); font-weight:700;}
+  .panel-head-right{display:flex; align-items:center; gap:10px;}
+  .panel-close{background:none; border:none; color:var(--ink-soft); font-size:1.3rem; line-height:1; cursor:pointer; padding:2px 4px;}
+  .panel-close:hover{color:var(--ink);}
+  .panel-note{font-size:0.85rem; color:var(--ink-soft); margin:-4px 0 14px; line-height:1.4;}
+
+  fieldset{border:none; padding:0; margin:0;}
+  legend{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-bottom:8px; padding:0;}
+
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    border:1.5px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    padding:7px 13px;
+    border-radius:999px;
+    font-size:0.85rem;
+    font-weight:600;
+    cursor:pointer;
+    user-select:none;
+    transition:border-color .15s, background .15s, color .15s;
+  }
+  .chip[aria-pressed="true"]{
+    background:var(--court);
+    border-color:var(--court);
+    color:var(--court-ink);
+  }
+  .chip:focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+  .chip .stale-tag{opacity:0.65; margin-left:3px; font-weight:600;}
+
+  .field-block{display:flex; flex-direction:column; gap:6px; margin-top:16px;}
+
+  .btn{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    font-weight:600;
+    font-size:0.95rem;
+    border-radius:8px;
+    padding:12px 18px;
+    border:1.5px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:transform .08s ease, opacity .15s;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn:focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+  .btn.primary{background:var(--court); border-color:var(--court); color:var(--court-ink);}
+  .btn.ghost{background:transparent; color:var(--ink); border-color:var(--line);}
+  .btn.block{width:100%;}
+  .btn[disabled]{opacity:0.45; cursor:not-allowed;}
+
+  .generate-row{margin-top:18px;}
+
+  /* ---- Plan ---- */
+  #planSection{display:flex; flex-direction:column; gap:14px;}
+  .plan-summary{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .plan-summary .total{font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:var(--ink-soft);}
+  .plan-summary .total b{color:var(--ink); font-size:1rem;}
+
+  .block-group{border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--paper);}
+  .block-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 14px;
+    background:var(--paper-3);
+    border-bottom:1px solid var(--line);
+  }
+  .block-head h3{font-size:0.85rem; letter-spacing:0.04em;}
+  .block-head .block-time{font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--ink-soft);}
+  .drill-row{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .drill-row:last-child{border-bottom:none;}
+  .drill-row .dur{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:0.85rem;
+    color:var(--court); min-width:3.4em; text-align:right; flex:none; padding-top:2px;
+  }
+  .drill-row .info{display:flex; flex-direction:column; gap:2px; min-width:0;}
+  .drill-row .info .name{font-weight:700; font-size:0.92rem;}
+  .drill-row .info .cue{font-size:0.82rem; color:var(--ink-soft); line-height:1.4;}
+  .drill-row.rest .info .name{color:var(--ink-soft); font-weight:600;}
+  .drill-row.rest .dur{color:var(--ink-soft);}
+
+  .elite-badge{
+    display:inline-block;
+    margin-left:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.62rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--court-ink);
+    background:var(--court);
+    border-radius:4px;
+    padding:2px 6px;
+    vertical-align:1px;
+  }
+  .player-mid .elite-badge{margin-left:10px; vertical-align:2px;}
+
+  .plan-actions{display:flex; gap:10px; flex-wrap:wrap;}
+  .plan-actions .btn{flex:1;}
+
+  /* ---- My drills (custom) ---- */
+  .custom-form{display:flex; flex-direction:column; gap:10px; margin-bottom:18px;}
+  .custom-form select,
+  .custom-form input[type="text"],
+  .custom-form input[type="number"]{
+    font-family:'Karla',sans-serif;
+    font-size:0.9rem;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1.5px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    width:100%;
+  }
+  .custom-form select:focus-visible,
+  .custom-form input:focus-visible{outline:2px solid var(--focus); outline-offset:1px;}
+  .custom-form .minutes-row{display:flex; align-items:center; gap:8px;}
+  .custom-form .minutes-row input{width:5em; flex:none;}
+  .custom-form .minutes-row span{font-size:0.82rem; color:var(--ink-soft);}
+
+  .custom-drill-row{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--line);}
+  .custom-drill-row:last-child{border-bottom:none;}
+  .custom-drill-row .cd-info{display:flex; flex-direction:column; gap:2px; min-width:0;}
+  .custom-drill-row .cd-cat{font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--court); font-weight:700;}
+  .custom-drill-row .cd-name{font-weight:700; font-size:0.9rem;}
+  .custom-drill-row .cd-cue{font-size:0.8rem; color:var(--ink-soft);}
+  .custom-drill-row .cd-remove{background:none; border:none; color:var(--warn); font-size:1.3rem; line-height:1; cursor:pointer; padding:2px 6px; flex:none;}
+
+  /* ---- Category totals ---- */
+  .category-bars{margin-bottom:16px;}
+  .bars-legend{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-bottom:10px;}
+  .bar-row{display:flex; align-items:center; gap:10px; margin-bottom:7px; font-size:0.8rem;}
+  .bar-row .bar-label{width:6.6em; flex:none; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .bar-row .bar-track{flex:1; height:8px; background:var(--paper-3); border-radius:4px; overflow:hidden;}
+  .bar-row .bar-fill{height:100%; background:var(--court); border-radius:4px;}
+  .bar-row .bar-value{width:4.4em; flex:none; text-align:right; color:var(--ink-soft);}
+
+  /* ---- Rep counter (player) ---- */
+  .rep-counter{display:flex; align-items:center; justify-content:center; gap:18px; margin-top:16px;}
+  .rep-counter[hidden]{display:none;}
+  .rep-btn{
+    width:44px; height:44px; border-radius:50%;
+    border:1.5px solid rgba(246,240,228,0.3);
+    background:rgba(246,240,228,0.06);
+    color:var(--paper);
+    font-family:'Oswald',sans-serif; font-size:1.5rem; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .rep-btn:focus-visible{outline:2px solid var(--court-2); outline-offset:2px;}
+  .rep-tally{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:2.3rem; min-width:2.2em; text-align:center; font-variant-numeric:tabular-nums;}
+  .rep-target{font-size:0.78rem; color:var(--paper-3,#a89a84); margin-top:8px;}
+
+  .rep-zones{display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:16px;}
+  .rep-zones[hidden]{display:none;}
+  .rep-zones-total{font-weight:700; font-size:2.1rem; font-variant-numeric:tabular-nums;}
+  .zone-grid{display:grid; grid-template-columns:repeat(3, minmax(80px,1fr)); gap:8px; max-width:380px;}
+  .zone-btn{
+    border:1.5px solid rgba(246,240,228,0.3);
+    background:rgba(246,240,228,0.06);
+    color:var(--paper);
+    border-radius:10px;
+    padding:10px 6px;
+    font-family:'Oswald',sans-serif;
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+  }
+  .zone-btn .zc{font-family:'JetBrains Mono',monospace; font-size:1.15rem; font-weight:700;}
+  .zone-btn:focus-visible{outline:2px solid var(--court-2); outline-offset:2px;}
+  .rep-zones-undo{
+    background:none; border:none; color:var(--paper-3,#a89a84);
+    font-size:0.78rem; text-decoration:underline; cursor:pointer; padding:4px;
+  }
+
+  /* ---- Player overlay ---- */
+  #player{
+    position:fixed; inset:0;
+    background:var(--ink);
+    color:var(--paper);
+    display:flex; flex-direction:column;
+    z-index:50;
+    padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(18px + env(safe-area-inset-bottom,0px));
+  }
+  #player[hidden]{display:none;}
+  .player-top{display:flex; justify-content:space-between; align-items:center; gap:10px;}
+  .player-top .seg-label{font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--paper-3, #b9ab97); opacity:0.75;}
+  .player-close{background:none; border:none; color:inherit; font-size:1.4rem; line-height:1; cursor:pointer; padding:4px 8px; opacity:0.7;}
+  .player-close:hover{opacity:1;}
+
+  .player-progress{height:4px; background:rgba(246,240,228,0.15); border-radius:4px; overflow:hidden; margin-top:14px;}
+  .player-progress > span{display:block; height:100%; background:var(--court-2); width:0%; transition:width .3s linear;}
+
+  .player-mid{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; text-align:center; padding:20px 0;}
+  .player-mid .kind{font-family:'JetBrains Mono',monospace; letter-spacing:0.15em; text-transform:uppercase; font-size:0.8rem; color:var(--court-2);}
+  .player-mid .kind.rest{color:var(--focus, #6ba9c7);}
+  .player-mid h2{font-size:clamp(1.5rem,7vw,2.2rem); margin-top:4px;}
+  .player-mid .clock{
+    font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:clamp(3.4rem, 22vw, 6.5rem);
+    line-height:1; margin-top:10px; font-variant-numeric:tabular-nums;
+  }
+  .player-mid .cue{max-width:420px; font-size:0.95rem; color:var(--paper-3,#cfc3ad); margin-top:10px; line-height:1.5;}
+  .player-mid .next{margin-top:22px; font-size:0.82rem; color:var(--paper-3,#a89a84);}
+  .player-mid .next b{color:var(--paper);}
+
+  .player-controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; padding-top:10px;}
+  .ctrl-btn{
+    border:1.5px solid rgba(246,240,228,0.3);
+    background:rgba(246,240,228,0.06);
+    color:var(--paper);
+    border-radius:999px;
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase; letter-spacing:0.03em; font-weight:600;
+    font-size:0.85rem;
+    padding:12px 20px;
+    cursor:pointer;
+  }
+  .ctrl-btn.main{background:var(--court); border-color:var(--court); color:var(--court-ink); padding:14px 30px; font-size:0.95rem;}
+  .ctrl-btn:focus-visible{outline:2px solid var(--court-2); outline-offset:2px;}
+
+  /* ---- History ---- */
+  .history-empty{color:var(--ink-soft); font-size:0.88rem;}
+  .streak-row{display:flex; gap:18px; margin-bottom:14px; flex-wrap:wrap;}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+  .badge-pill{
+    font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.04em; color:var(--success);
+    background:var(--success-bg); border-radius:999px; padding:5px 12px;
+  }
+
+  .badges-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:10px;}
+  .badge-tile{
+    border:1.5px solid var(--line); border-radius:10px; padding:14px 10px;
+    text-align:center; font-size:0.78rem; font-weight:600; color:var(--ink-soft);
+    background:var(--paper); line-height:1.3;
+  }
+  .badge-tile.earned{border-color:var(--success); color:var(--success); background:var(--success-bg);}
+  .badge-tile .bt-check{display:block; font-family:'JetBrains Mono',monospace; font-size:0.68rem; margin-bottom:6px; opacity:0.75;}
+  .stat{display:flex; flex-direction:column; gap:2px;}
+  .stat .num{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.5rem; color:var(--court);}
+  .stat.pr .num{color:var(--success);}
+  .stat .lbl{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft);}
+
+  .goal-row{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);
+    font-size:0.85rem; color:var(--ink-soft);
+  }
+  .goal-row input[type="number"]{
+    width:3.6em; font-family:'JetBrains Mono',monospace; font-size:0.9rem; text-align:center;
+    padding:6px 4px; border-radius:6px; border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+  }
+  .goal-row .goal-progress{font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--ink);}
+  .goal-row .goal-progress.met{color:var(--success);}
+
+  .log-row{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    font-size:0.88rem;
+  }
+  .log-row:last-child{border-bottom:none;}
+  .log-row .ldate{font-weight:700; min-width:5.5em;}
+  .log-row .lfocus{color:var(--ink-soft); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .log-row .lmeta{font-family:'JetBrains Mono',monospace; color:var(--ink-soft); font-size:0.8rem; text-align:right; flex:none;}
+  .log-row .lmeta .done{color:var(--success);}
+  .log-row .lmeta .partial{color:var(--warn);}
+  .pr-badge{
+    display:inline-block; margin-left:6px; font-family:'JetBrains Mono',monospace; font-size:0.62rem;
+    font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--court-ink);
+    background:var(--success); border-radius:4px; padding:2px 6px; vertical-align:1px;
+  }
+  .clear-log{margin-top:12px;}
+  .clear-confirm-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:0.85rem; color:var(--ink-soft);}
+  .clear-confirm-row .btn{padding:8px 14px; font-size:0.85rem;}
+  .clear-confirm-row .warn-btn{border-color:var(--warn); color:var(--warn);}
+  .clear-confirm-row .warn-btn:hover{background:var(--warn); color:var(--court-ink);}
+
+  /* ---- Rep targets (My drills) ---- */
+  .rep-target-row{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line);}
+  .rep-target-row:last-child{border-bottom:none;}
+  .rep-target-row .rt-name{font-size:0.88rem; font-weight:600;}
+  .rep-target-row input[type="number"]{
+    width:4.2em; font-family:'JetBrains Mono',monospace; font-size:0.9rem; text-align:center;
+    padding:6px 4px; border-radius:6px; border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+  }
+  .rep-targets-wrap{margin-bottom:18px;}
+
+  footer{margin-top:6px; font-size:0.75rem; color:var(--ink-soft); text-align:center;}
+
+  @media (prefers-reduced-motion:reduce){
+    .player-progress > span{transition:none;}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="title">
+      <svg class="ball" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="47" fill="var(--court)"></circle>
+        <path d="M50,4 L50,96 M4,50 L96,50 M37,5 Q6,50 37,95 M63,5 Q94,50 63,95"
+              fill="none" stroke="var(--court-ink)" stroke-width="4" stroke-linecap="round" opacity="0.8"></path>
+      </svg>
+      Run The Play
+    </div>
+    <div class="tagline">Practice generator &amp; log</div>
+  </header>
+
+  <div class="profile-bar">
+    <span class="profile-current">Playing as <b id="profileCurrentName">Player 1</b></span>
+    <button class="btn-add-profile" id="switchProfileBtn" type="button">Switch player</button>
+  </div>
+
+  <!-- HOME SCREEN: profile picker -->
+  <section class="panel" id="profileScreen" hidden>
+    <div class="panel-head">
+      <h2>Who's playing?</h2>
+      <button class="panel-close" id="closeProfileScreenBtn" aria-label="Back">&times;</button>
+    </div>
+    <p class="panel-note">Each player gets their own workouts, log, and custom drills.</p>
+    <div class="profile-grid" id="profileGrid"></div>
+    <div class="add-profile-form" id="addProfileForm" hidden>
+      <input type="text" id="newProfileName" placeholder="Player name" maxlength="24" aria-label="Player name">
+      <div class="add-profile-actions">
+        <button class="btn primary" id="createProfileBtn" type="button">Create</button>
+        <button class="btn ghost" id="cancelProfileBtn" type="button">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="appBody">
+
+  <!-- STEP 1: SETUP -->
+  <section class="panel" id="setup">
+    <div class="panel-head">
+      <h2>Build today's workout</h2>
+      <span class="step-num">01</span>
+    </div>
+
+    <fieldset>
+      <legend>Focus areas</legend>
+      <div class="chip-row" id="focusChips" role="group" aria-label="Focus areas"></div>
+    </fieldset>
+
+    <div class="field-block">
+      <fieldset>
+        <legend>Total time</legend>
+        <div class="chip-row" id="durationChips" role="radiogroup" aria-label="Total time"></div>
+      </fieldset>
+    </div>
+
+    <div class="field-block">
+      <fieldset>
+        <legend>Level</legend>
+        <div class="chip-row" id="levelChips" role="radiogroup" aria-label="Level"></div>
+      </fieldset>
+    </div>
+
+    <div class="field-block">
+      <fieldset>
+        <legend>Rest between drills</legend>
+        <div class="chip-row" id="restChips" role="radiogroup" aria-label="Rest between drills"></div>
+      </fieldset>
+    </div>
+
+    <div class="field-block">
+      <fieldset>
+        <legend>Options</legend>
+        <div class="chip-row" id="optionChips" role="group" aria-label="Session options"></div>
+      </fieldset>
+    </div>
+
+    <div class="field-block">
+      <fieldset>
+        <legend>Where are you playing?</legend>
+        <div class="chip-row" id="spaceChips" role="radiogroup" aria-label="Where are you playing"></div>
+      </fieldset>
+    </div>
+
+    <div class="generate-row">
+      <button class="btn primary block" id="generateBtn">Generate workout</button>
+      <button class="btn ghost block" id="repeatBtn" style="margin-top:10px;" hidden>Repeat last plan</button>
+    </div>
+  </section>
+
+  <!-- STEP 2: PLAN -->
+  <section class="panel" id="planSection" hidden>
+    <div class="panel-head">
+      <h2>Today's plan</h2>
+      <div class="panel-head-right">
+        <span class="step-num">02</span>
+        <button class="panel-close" id="dismissPlanBtn" aria-label="Close plan">&times;</button>
+      </div>
+    </div>
+    <div class="plan-summary">
+      <div class="total">Total time <b id="planTotal">--</b></div>
+      <div class="total" id="planFocusSummary"></div>
+    </div>
+    <div id="planBlocks"></div>
+    <div class="plan-actions">
+      <button class="btn ghost" id="regenBtn">Shuffle again</button>
+      <button class="btn primary" id="startBtn">Start session</button>
+    </div>
+  </section>
+
+  <!-- STEP 3: HISTORY -->
+  <section class="panel" id="historySection">
+    <div class="panel-head">
+      <h2>Practice log</h2>
+      <div class="panel-head-right">
+        <button class="btn-add-profile" id="showBadgesBtn" type="button">Badges</button>
+        <span class="step-num">03</span>
+      </div>
+    </div>
+    <div id="historyBody"></div>
+  </section>
+
+  <!-- BADGES SCREEN -->
+  <section class="panel" id="badgesSection" hidden>
+    <div class="panel-head">
+      <h2>Badges</h2>
+      <button class="panel-close" id="closeBadgesBtn" aria-label="Close badges">&times;</button>
+    </div>
+    <p class="panel-note">Earned badges are lit up; the rest show what's still ahead.</p>
+    <div class="badges-grid" id="badgesGrid"></div>
+  </section>
+
+  <!-- STEP 4: CUSTOM DRILLS -->
+  <section class="panel" id="customSection">
+    <div class="panel-head">
+      <h2>My drills</h2>
+      <span class="step-num">04</span>
+    </div>
+    <p class="panel-note">Add your own and they'll get mixed into the generator for that focus area, right alongside the built-in drills.</p>
+    <div class="custom-form">
+      <select id="customCategory" aria-label="Focus area"></select>
+      <input type="text" id="customName" placeholder="Drill name" aria-label="Drill name">
+      <input type="text" id="customCue" placeholder="Coaching cue (optional)" aria-label="Coaching cue">
+      <div class="minutes-row">
+        <input type="number" id="customMinutes" min="1" max="20" step="1" value="2" aria-label="Minutes">
+        <span>minutes</span>
+      </div>
+      <button class="btn primary" id="addCustomBtn">Add drill</button>
+    </div>
+    <div id="customList"></div>
+  </section>
+
+  <footer>Timers and beeps run in this browser tab &mdash; keep it open while a session is going.</footer>
+
+  </div>
+</div>
+
+<!-- FULLSCREEN PLAYER -->
+<div id="player" hidden>
+  <div class="player-top">
+    <span class="seg-label" id="segLabel">Segment 1 / 12</span>
+    <button class="player-close" id="closePlayer" aria-label="Close session">&times;</button>
+  </div>
+  <div class="player-progress"><span id="progressBar"></span></div>
+  <div class="player-mid">
+    <div class="kind" id="kindLabel">WORK</div>
+    <h2 id="drillName">Drill name</h2>
+    <div class="clock" id="clock">00:00</div>
+    <div class="rep-counter" id="repCounter" hidden>
+      <button class="rep-btn" id="repMinusBtn" aria-label="Subtract one make">&minus;</button>
+      <span class="rep-tally mono" id="repTally">0</span>
+      <button class="rep-btn" id="repPlusBtn" aria-label="Add one make">+</button>
+    </div>
+    <div class="rep-zones" id="repZones" hidden>
+      <div class="rep-zones-total mono" id="repZonesTotal">0</div>
+      <div class="zone-grid" id="zoneGrid"></div>
+      <button class="rep-zones-undo" id="zoneUndoBtn" type="button">Undo last make</button>
+    </div>
+    <div class="rep-target" id="repTarget"></div>
+    <div class="cue" id="cueText"></div>
+    <div class="next" id="nextText"></div>
+  </div>
+  <div class="player-controls">
+    <button class="ctrl-btn" id="skipBackBtn">&larr; Back</button>
+    <button class="ctrl-btn main" id="pauseBtn">Pause</button>
+    <button class="ctrl-btn" id="ffBtn">+10s</button>
+    <button class="ctrl-btn" id="skipFwdBtn">Skip &rarr;</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ DRILL LIBRARY ============ */
+  var DRILLS = {
+    warmup: [
+      {name:"High knees & butt kicks", cue:"Light bounce, relaxed shoulders. Wake up the calves and lungs.", sec:120},
+      {name:"Dynamic stretch circuit", cue:"Leg swings, walking lunges, arm circles, ankle rolls.", sec:120},
+      {name:"Layup line warm-up", cue:"Easy pace, both hands, both sides of the rim. Get a feel for the ball.", sec:120}
+    ],
+    cooldown: [
+      {name:"Static stretch", cue:"Hamstrings, quads, calves, hip flexors. Hold each 20-30 sec.", sec:90},
+      {name:"Breathing reset", cue:"Slow nasal breathing, walk it out, let the heart rate settle.", sec:60}
+    ],
+    ballhandling: [
+      {name:"Stationary pound dribble", cue:"Low stance, eyes up, ball below the knee. Alternate hands.", sec:60},
+      {name:"Figure-8 crossover", cue:"Weave the ball through and around your legs without looking down.", sec:60},
+      {name:"Two-ball dribble", cue:"Both balls at once — same rhythm, then alternating rhythm.", sec:60},
+      {name:"Crossover-behind-between combo", cue:"String all three moves together on the move, walking speed first.", sec:75},
+      {name:"Full-speed zig-zag dribble", cue:"Attack cone to cone with a hard crossover at each change of direction.", sec:75},
+      {name:"Pound-and-go", cue:"Hard in-place dribbles, then explode into a first step on the whistle in your head.", sec:60}
+    ],
+    shooting: [
+      {name:"Form shooting (close range)", cue:"One hand, high release, snap the wrist. Rebuild the mechanics before moving out.", sec:90, reps:true, target:20},
+      {name:"Spot-up catch-and-shoot", cue:"Footwork set before the catch. Same 5 spots around the arc.", sec:90, reps:true, target:25, zones:["Left corner","Left wing","Top of key","Right wing","Right corner"]},
+      {name:"Free throws", cue:"Full routine every rep — same dribbles, same breath, same release.", sec:90, reps:true, target:10},
+      {name:"1-dribble pull-up", cue:"Attack the space, one hard dribble, rise and shoot on balance.", sec:90},
+      {name:"Off-the-move 3s", cue:"Curl or fade off an imaginary screen into your shot pocket.", sec:90},
+      {name:"Elbow-to-elbow shooting", cue:"Sprint elbow to elbow, catch and fire, sprint back — no standing around.", sec:75},
+      {name:"Floater/runner practice", cue:"Two-foot or one-foot finish off the gather, soft touch off the glass.", sec:75}
+    ],
+    finishing: [
+      {name:"Right/left layup lines", cue:"Full speed approach, strong plant, soft touch off the correct hand.", sec:75},
+      {name:"Euro-step finishes", cue:"Sell the first direction, gather, lateral step, finish through contact.", sec:75},
+      {name:"Reverse layups", cue:"Attack baseline, spin under, finish on the far side of the rim.", sec:75},
+      {name:"Post-up up-and-under", cue:"Feel for the defender's weight, jab, then counter the opposite way.", sec:75},
+      {name:"Contact finishes", cue:"Absorb a pad/chair bump at the rim and still finish through it.", sec:60},
+      {name:"Floater off two feet", cue:"Live-dribble approach into a soft two-foot floater over an imaginary big.", sec:75}
+    ],
+    defense: [
+      {name:"Defensive slide shuffle", cue:"Stay low, wide base, no crossing feet. Chair-sit angle.", sec:60},
+      {name:"Closeout sprint-to-slide", cue:"Sprint out, chop the feet, hands up, settle into a stance.", sec:60},
+      {name:"Mirror drill", cue:"Partner or shadow — mirror every direction change, staying square.", sec:60},
+      {name:"Box-out reps", cue:"Find a body, hips down, pin and hold position before pursuing the ball.", sec:60},
+      {name:"Full-court denial slides", cue:"Deny an imaginary cutter baseline to baseline, active hands.", sec:75},
+      {name:"Charge/take stance drill", cue:"Sprint, plant, take a legal guarding position without moving the feet.", sec:60}
+    ],
+    conditioning: [
+      {name:"Suicides (17s)", cue:"Free-throw line, half, far line, baseline — sprint and touch each line.", sec:90, needsFullCourt:true},
+      {name:"Defensive slide + sprint ladder", cue:"Alternate 5 sec of slides with 5 sec sprints for the full interval.", sec:90},
+      {name:"Full-court sprints", cue:"Baseline to baseline, walk-back recovery built into the rest period.", sec:75, needsFullCourt:true},
+      {name:"Suicide + shot finisher", cue:"Sprint the line then finish a layup before recovering — game-speed fatigue shooting.", sec:90, needsFullCourt:true},
+      {name:"Driveway shuttle sprints", cue:"Sprint out to the end of your space and back, working shorter each rep — no more room than a driveway needed.", sec:75},
+      {name:"Single-hoop suicide mimic", cue:"Sprint out and back to three markers within your own space, touching each before recovering.", sec:75}
+    ]
+  };
+
+  /* Elite-only drills: harder variants that only get pulled into the plan at the Elite level.
+     Every Elite-level focus block guarantees at least one of these. */
+  var ELITE_DRILLS = {
+    ballhandling: [
+      {name:"Two-ball, two-height dribble", cue:"One ball chest-high pound, one ball ankle-high crossover — swap heights every 10 sec without losing either rhythm.", sec:60, elite:true},
+      {name:"Live combo attack", cue:"In-and-out into hesitation into crossover, strung together at full game speed into a finish — no walking through it.", sec:75, elite:true},
+      {name:"Blind dribble series", cue:"Eyes locked on an imaginary defender's chest the entire rep — never glance down at the ball.", sec:60, elite:true}
+    ],
+    shooting: [
+      {name:"Contested pull-up", cue:"Get a hard closeout from a partner (or sprint at a chair) and rise into the shot through the contest.", sec:90, elite:true},
+      {name:"Retreat-dribble threes", cue:"Two hard dribbles backward off the catch into a fully-balanced three — sell the space before you shoot it.", sec:90, elite:true},
+      {name:"Fatigue free throws", cue:"Max-effort 30-second sprint first, then a full free-throw routine that still has to go in on a spiked heart rate.", sec:90, elite:true}
+    ],
+    finishing: [
+      {name:"Two-defender gauntlet", cue:"Attack through two imaginary bodies at the rim — absorb the first, adjust, finish through the second.", sec:75, elite:true},
+      {name:"Live-read finish", cue:"Attack full speed and decide the finish on the fly — euro, floater, or reverse — based on where the help defender is.", sec:75, elite:true}
+    ],
+    defense: [
+      {name:"Live 1-on-1 closeout to contain", cue:"Full-speed closeout into staying attached through a live-speed attack for a full possession.", sec:75, elite:true},
+      {name:"Transition sprint-to-stance", cue:"Sprint the length of the floor and drop into a real defensive stance before the imaginary ball-handler arrives.", sec:60, elite:true, needsFullCourt:true}
+    ]
+  };
+
+  var ELITE_FINISHERS = [
+    {name:"17s to failure", cue:"Full 17-second suicides back to back, no rest, until you genuinely can't hold the pace.", elite:true, needsFullCourt:true},
+    {name:"Suicide-to-finish gauntlet", cue:"Sprint a full suicide, then finish three different shots before you're allowed to catch your breath.", elite:true, needsFullCourt:true},
+    {name:"Two-ball fatigue finisher", cue:"Two-ball pound series to failure, then finish three shots without stopping — no more room than your own hoop needed.", elite:true}
+  ];
+
+  var CATEGORY_LABEL = {
+    ballhandling:"Ballhandling", shooting:"Shooting", finishing:"Finishing",
+    defense:"Defense &amp; footwork", conditioning:"Conditioning"
+  };
+  var CATEGORY_ORDER = ["ballhandling","shooting","finishing","defense","conditioning"];
+
+  // Every break is a flat 30 sec and is open-ended (see isOpenEnded) — it doesn't
+  // count down and force you to move on; you hit Continue whenever you're ready.
+  var REST_SECONDS = 30;
+  var LEVEL_LABEL = {beginner:"Beginner", intermediate:"Intermediate", advanced:"Advanced", elite:"Elite"};
+  var LEVEL_ORDER = ["beginner","intermediate","advanced","elite"];
+  // Advanced and elite tack on an extra conditioning finisher (skipped on sub-20-min sessions
+  // so quick sessions stay quick).
+  var FINISHER_BY_LEVEL = {
+    advanced: {count:1, work:60},
+    elite: {count:2, work:70}
+  };
+
+  /* ============ STATE ============ */
+  var state = {
+    focus: ["ballhandling","shooting"],
+    duration: 30,
+    level: "intermediate",
+    restSeconds: 30,
+    skipWarmup: false,
+    skipCooldown: false,
+    space: "gym",
+    plan: null,       // {blocks:[{key,label,items:[...]}], totalSec, focusList, level, duration}
+    sequence: null,   // flat list of {type:'warmup'|'work'|'rest'|'cooldown', name, cue, sec, blockLabel}
+    player: {
+      idx: 0,
+      remaining: 0,
+      running: false,
+      timerId: null,
+      completedWork: 0,
+      totalWork: 0
+    }
+  };
+
+  var STORAGE_KEY = "rtp_sessions_v1";
+  var CUSTOM_DRILLS_KEY = "rtp_custom_drills_v1";
+  var LAST_DRILLS_KEY = "rtp_last_drills_v1";
+
+  /* ============ PLAYER PROFILES ============
+     Multiple players can share one browser; each gets their own sessions, custom
+     drills and last-used-drills, kept in localStorage keys suffixed with their
+     profile id. PROFILES_KEY/ACTIVE_PROFILE_KEY themselves are never namespaced. */
+  var PROFILES_KEY = "rtp_profiles_v1";
+  var ACTIVE_PROFILE_KEY = "rtp_active_profile_v1";
+
+  function loadProfiles(){
+    try{
+      var raw = localStorage.getItem(PROFILES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveProfiles(list){
+    try{ localStorage.setItem(PROFILES_KEY, JSON.stringify(list)); }catch(e){}
+  }
+  function getActiveProfileId(){
+    try{ return localStorage.getItem(ACTIVE_PROFILE_KEY); }catch(e){ return null; }
+  }
+  function setActiveProfileId(id){
+    try{ localStorage.setItem(ACTIVE_PROFILE_KEY, id); }catch(e){}
+  }
+  // Every profile-scoped storage key is built from this, so switching the active
+  // profile is enough to make every load/save function read/write the right data.
+  function nsKey(base){
+    return base + "__" + (getActiveProfileId() || "p1");
+  }
+
+  // First-ever run: if there's no profile list yet, create one default profile and
+  // fold any pre-existing (pre-profiles) data into it so nothing gets lost.
+  function ensureProfiles(){
+    var profiles = loadProfiles();
+    if(!profiles.length){
+      var legacySessions = null, legacyCustom = null, legacyLast = null;
+      try{ legacySessions = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      try{ legacyCustom = localStorage.getItem(CUSTOM_DRILLS_KEY); }catch(e){}
+      try{ legacyLast = localStorage.getItem(LAST_DRILLS_KEY); }catch(e){}
+
+      profiles = [{id:"p1", name:"Player 1", createdAt: new Date().toISOString()}];
+      saveProfiles(profiles);
+      setActiveProfileId("p1");
+
+      try{
+        if(legacySessions !== null){ localStorage.setItem(nsKey(STORAGE_KEY), legacySessions); localStorage.removeItem(STORAGE_KEY); }
+        if(legacyCustom !== null){ localStorage.setItem(nsKey(CUSTOM_DRILLS_KEY), legacyCustom); localStorage.removeItem(CUSTOM_DRILLS_KEY); }
+        if(legacyLast !== null){ localStorage.setItem(nsKey(LAST_DRILLS_KEY), legacyLast); localStorage.removeItem(LAST_DRILLS_KEY); }
+      }catch(e){ /* storage unavailable, continue without migrating */ }
+    } else if(!getActiveProfileId() || !profiles.some(function(p){ return p.id === getActiveProfileId(); })){
+      setActiveProfileId(profiles[0].id);
+    }
+  }
+
+  function getProfileName(id){
+    var p = loadProfiles().filter(function(x){ return x.id === id; })[0];
+    return p ? p.name : "Player";
+  }
+
+  function addProfile(name){
+    var profiles = loadProfiles();
+    var id = "p" + Date.now().toString(36) + Math.floor(Math.random()*1000).toString(36);
+    profiles.push({id:id, name:name, createdAt: new Date().toISOString()});
+    saveProfiles(profiles);
+    setActiveProfileId(id);
+    return id;
+  }
+
+  // Removes a profile (never the last remaining one) along with its own sessions,
+  // custom drills and last-drills data. If it was the active profile, whichever
+  // profile is now first becomes active and the app body is refreshed to match.
+  function deleteProfile(id){
+    var profiles = loadProfiles();
+    if(profiles.length <= 1) return;
+    var remaining = profiles.filter(function(p){ return p.id !== id; });
+    saveProfiles(remaining);
+    try{
+      localStorage.removeItem(STORAGE_KEY + "__" + id);
+      localStorage.removeItem(CUSTOM_DRILLS_KEY + "__" + id);
+      localStorage.removeItem(LAST_DRILLS_KEY + "__" + id);
+    }catch(e){}
+    if(getActiveProfileId() === id){
+      setActiveProfileId(remaining[0].id);
+      refreshAppForActiveProfile();
+    }
+  }
+
+  // Re-renders everything that depends on the active profile's own data
+  // (sessions, custom drills, weak-area defaults) without touching which
+  // screen (picker vs. app body) is currently showing.
+  function refreshAppForActiveProfile(){
+    if(state.player && state.player.timerId){ clearTimeout(state.player.timerId); }
+    $("player").hidden = true;
+    state.plan = null;
+    state.sequence = null;
+    $("planSection").hidden = true;
+    $("badgesSection").hidden = true;
+    $("focusChips").innerHTML = "";
+    $("durationChips").innerHTML = "";
+    $("levelChips").innerHTML = "";
+    $("restChips").innerHTML = "";
+    $("optionChips").innerHTML = "";
+    $("spaceChips").innerHTML = "";
+    state.focus = ["ballhandling","shooting"];
+    state.duration = 30;
+    state.level = "intermediate";
+    state.restSeconds = 30;
+    state.space = "gym";
+    state.skipWarmup = false;
+    state.skipCooldown = false;
+    buildChips();
+    renderCustomDrills();
+    renderHistory();
+    renderProfileBar();
+  }
+
+  // Switches which profile's data everything reads/writes, then re-renders the
+  // whole app body against that profile's own sessions/custom drills/defaults.
+  function switchToProfile(id){
+    setActiveProfileId(id);
+    refreshAppForActiveProfile();
+    $("profileScreen").hidden = true;
+    $("appBody").hidden = false;
+  }
+
+  function renderProfileBar(){
+    $("profileCurrentName").textContent = getProfileName(getActiveProfileId());
+  }
+
+  function renderProfileGrid(){
+    var grid = $("profileGrid");
+    grid.innerHTML = "";
+    var activeId = getActiveProfileId();
+
+    var profiles = loadProfiles();
+    var canDelete = profiles.length > 1;
+
+    profiles.forEach(function(p){
+      var row = document.createElement("div");
+      row.className = "profile-card-row";
+
+      function showNormal(){
+        row.innerHTML = "";
+        var card = document.createElement("button");
+        card.type = "button";
+        card.className = "profile-card" + (p.id === activeId ? " active" : "");
+        var name = document.createElement("span");
+        name.textContent = p.name;
+        card.appendChild(name);
+        if(p.id === activeId){
+          var meta = document.createElement("span");
+          meta.className = "pc-meta";
+          meta.textContent = "Playing now";
+          card.appendChild(meta);
+        }
+        card.addEventListener("click", function(){ switchToProfile(p.id); });
+        row.appendChild(card);
+
+        if(canDelete){
+          var delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.className = "profile-edit-btn";
+          delBtn.textContent = "Delete";
+          delBtn.setAttribute("aria-label", "Delete " + p.name);
+          delBtn.addEventListener("click", function(){ showDeleteConfirm(); });
+          row.appendChild(delBtn);
+        }
+      }
+
+      function showDeleteConfirm(){
+        row.innerHTML = "";
+        var confirmRow = document.createElement("div");
+        confirmRow.className = "clear-confirm-row";
+        confirmRow.style.flex = "1";
+        var text = document.createElement("span");
+        text.textContent = "Delete " + p.name + "? This can't be undone.";
+        var yesBtn = document.createElement("button");
+        yesBtn.type = "button";
+        yesBtn.className = "btn ghost warn-btn";
+        yesBtn.textContent = "Yes, delete";
+        var noBtn = document.createElement("button");
+        noBtn.type = "button";
+        noBtn.className = "btn ghost";
+        noBtn.textContent = "Cancel";
+        yesBtn.style.padding = noBtn.style.padding = "8px 14px";
+        yesBtn.style.fontSize = noBtn.style.fontSize = "0.85rem";
+
+        yesBtn.addEventListener("click", function(){
+          deleteProfile(p.id);
+          renderProfileGrid();
+        });
+        noBtn.addEventListener("click", showNormal);
+
+        confirmRow.appendChild(text);
+        confirmRow.appendChild(yesBtn);
+        confirmRow.appendChild(noBtn);
+        row.appendChild(confirmRow);
+      }
+
+      showNormal();
+      grid.appendChild(row);
+    });
+
+    var addCard = document.createElement("button");
+    addCard.type = "button";
+    addCard.className = "profile-card profile-card-add";
+    addCard.textContent = "+ Add player";
+    addCard.addEventListener("click", function(){
+      $("addProfileForm").hidden = false;
+      $("newProfileName").value = "";
+      $("newProfileName").focus();
+    });
+    grid.appendChild(addCard);
+  }
+
+  /* ============ CUSTOM DRILLS ============ */
+  function loadCustomDrills(){
+    try{
+      var raw = localStorage.getItem(nsKey(CUSTOM_DRILLS_KEY));
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveCustomDrills(map){
+    try{ localStorage.setItem(nsKey(CUSTOM_DRILLS_KEY), JSON.stringify(map)); }catch(e){}
+  }
+  function addCustomDrill(category, name, cue, sec){
+    var map = loadCustomDrills();
+    if(!map[category]) map[category] = [];
+    map[category].push({name:name, cue: cue || "Your own drill.", sec:sec, custom:true});
+    saveCustomDrills(map);
+  }
+  function removeCustomDrill(category, index){
+    var map = loadCustomDrills();
+    if(map[category]){
+      map[category].splice(index, 1);
+      saveCustomDrills(map);
+    }
+  }
+
+  /* ============ MULTI-DAY AWARENESS ============ */
+  function loadLastDrills(){
+    try{
+      var raw = localStorage.getItem(nsKey(LAST_DRILLS_KEY));
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveLastDrills(map){
+    try{ localStorage.setItem(nsKey(LAST_DRILLS_KEY), JSON.stringify(map)); }catch(e){}
+  }
+
+  /* ============ HELPERS ============ */
+  function $(id){ return document.getElementById(id); }
+  function fmtClock(totalSec){
+    var m = Math.floor(totalSec/60), s = totalSec%60;
+    return (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+  }
+  function fmtMinLabel(sec){
+    var m = Math.round(sec/60);
+    return m + " min";
+  }
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+  function pick(arr, n){ return shuffle(arr).slice(0, Math.min(n, arr.length)); }
+
+  // Prefers drills not in avoidNames (e.g. what was used last time this category came up);
+  // falls back to the full pool if filtering would leave nothing to choose from.
+  function excludingRecent(pool, avoidNames){
+    if(!avoidNames || !avoidNames.length) return pool;
+    var filtered = pool.filter(function(d){ return avoidNames.indexOf(d.name) === -1; });
+    return filtered.length ? filtered : pool;
+  }
+
+  // In a driveway (no full court), drop drills tagged needsFullCourt — falls
+  // back to the unfiltered pool if that would leave nothing to pick from.
+  function filterBySpace(pool){
+    if(state.space !== "driveway") return pool;
+    var filtered = pool.filter(function(d){ return !d.needsFullCourt; });
+    return filtered.length ? filtered : pool;
+  }
+
+  // How many whole days ago a date was.
+  function daysAgo(date){
+    return Math.max(0, Math.floor((Date.now() - date.getTime()) / 86400000));
+  }
+
+  // Per-category history: when each focus area was last practiced, and total minutes logged in it.
+  function computeCategoryStats(sessions){
+    var stats = {};
+    CATEGORY_ORDER.forEach(function(k){ stats[k] = {lastDate:null, totalMin:0}; });
+    sessions.forEach(function(s){
+      var d = new Date(s.date);
+      (s.focus || []).forEach(function(k){
+        if(stats[k] && (!stats[k].lastDate || d > stats[k].lastDate)) stats[k].lastDate = d;
+      });
+      if(s.categoryMinutes){
+        Object.keys(s.categoryMinutes).forEach(function(k){
+          if(stats[k]) stats[k].totalMin += s.categoryMinutes[k];
+        });
+      }
+    });
+    return stats;
+  }
+
+  // Total seconds a plan block takes, including its internal rests.
+  function blockSeconds(block){
+    return block.items.reduce(function(sum, it){ return sum + it.sec; }, 0) +
+      (block.rest ? block.rest * Math.max(0, block.items.length - 1) : 0);
+  }
+
+  /* ============ SETUP CHIPS ============ */
+  function buildChips(){
+    // Default to whichever focus areas have gone longest without practice, when there's
+    // history to judge that from. First-ever use keeps the built-in ballhandling/shooting default.
+    var sessions = loadSessions();
+    var catStats = computeCategoryStats(sessions);
+    if(sessions.length){
+      var ranked = CATEGORY_ORDER.slice().sort(function(a, b){
+        var da = catStats[a].lastDate ? catStats[a].lastDate.getTime() : -1;
+        var db = catStats[b].lastDate ? catStats[b].lastDate.getTime() : -1;
+        return da - db;
+      });
+      state.focus = ranked.slice(0, 2);
+    }
+
+    var focusWrap = $("focusChips");
+    focusWrap.innerHTML = "";
+    CATEGORY_ORDER.forEach(function(key){
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = CATEGORY_LABEL[key].replace("&amp;","&");
+      if(sessions.length){
+        var tag = document.createElement("span");
+        tag.className = "stale-tag";
+        var da = catStats[key].lastDate ? daysAgo(catStats[key].lastDate) : null;
+        tag.textContent = (da === null || isNaN(da) || da <= 0) ? " · New" : (" · " + da + "d");
+        chip.appendChild(tag);
+      }
+      chip.dataset.key = key;
+      chip.setAttribute("aria-pressed", state.focus.indexOf(key) > -1 ? "true" : "false");
+      chip.addEventListener("click", function(){
+        var idx = state.focus.indexOf(key);
+        if(idx > -1){
+          if(state.focus.length === 1){ return; } // keep at least one
+          state.focus.splice(idx,1);
+        } else {
+          state.focus.push(key);
+        }
+        chip.setAttribute("aria-pressed", state.focus.indexOf(key) > -1 ? "true" : "false");
+      });
+      focusWrap.appendChild(chip);
+    });
+
+    var durWrap = $("durationChips");
+    durWrap.innerHTML = "";
+    [10,20,30,45,60].forEach(function(mins){
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = mins + " min";
+      chip.setAttribute("role","radio");
+      chip.setAttribute("aria-pressed", mins === state.duration ? "true" : "false");
+      chip.addEventListener("click", function(){
+        state.duration = mins;
+        Array.prototype.forEach.call(durWrap.children, function(c){ c.setAttribute("aria-pressed","false"); });
+        chip.setAttribute("aria-pressed","true");
+      });
+      durWrap.appendChild(chip);
+    });
+
+    var lvlWrap = $("levelChips");
+    lvlWrap.innerHTML = "";
+    LEVEL_ORDER.forEach(function(lvl){
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = LEVEL_LABEL[lvl];
+      chip.setAttribute("role","radio");
+      chip.setAttribute("aria-pressed", lvl === state.level ? "true" : "false");
+      chip.addEventListener("click", function(){
+        state.level = lvl;
+        Array.prototype.forEach.call(lvlWrap.children, function(c){ c.setAttribute("aria-pressed","false"); });
+        chip.setAttribute("aria-pressed","true");
+      });
+      lvlWrap.appendChild(chip);
+    });
+
+    var restWrap = $("restChips");
+    restWrap.innerHTML = "";
+    [15,30,45,60].forEach(function(secs){
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = secs + "s";
+      chip.setAttribute("role","radio");
+      chip.setAttribute("aria-pressed", secs === state.restSeconds ? "true" : "false");
+      chip.addEventListener("click", function(){
+        state.restSeconds = secs;
+        Array.prototype.forEach.call(restWrap.children, function(c){ c.setAttribute("aria-pressed","false"); });
+        chip.setAttribute("aria-pressed","true");
+      });
+      restWrap.appendChild(chip);
+    });
+
+    var spaceWrap = $("spaceChips");
+    spaceWrap.innerHTML = "";
+    [
+      {key:"driveway", label:"Driveway"},
+      {key:"gym", label:"Gym"}
+    ].forEach(function(opt){
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = opt.label;
+      chip.setAttribute("role","radio");
+      chip.setAttribute("aria-pressed", opt.key === state.space ? "true" : "false");
+      chip.addEventListener("click", function(){
+        state.space = opt.key;
+        Array.prototype.forEach.call(spaceWrap.children, function(c){ c.setAttribute("aria-pressed","false"); });
+        chip.setAttribute("aria-pressed","true");
+      });
+      spaceWrap.appendChild(chip);
+    });
+
+    var optWrap = $("optionChips");
+    optWrap.innerHTML = "";
+    [
+      {key:"skipWarmup", label:"Skip warm-up"},
+      {key:"skipCooldown", label:"Skip cool-down"}
+    ].forEach(function(opt){
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = opt.label;
+      chip.setAttribute("aria-pressed", state[opt.key] ? "true" : "false");
+      chip.addEventListener("click", function(){
+        state[opt.key] = !state[opt.key];
+        chip.setAttribute("aria-pressed", state[opt.key] ? "true" : "false");
+      });
+      optWrap.appendChild(chip);
+    });
+  }
+
+  /* ============ MY DRILLS UI ============ */
+  function populateCustomCategorySelect(){
+    var select = $("customCategory");
+    CATEGORY_ORDER.forEach(function(key){
+      var opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = CATEGORY_LABEL[key].replace("&amp;","&");
+      select.appendChild(opt);
+    });
+  }
+
+  function renderCustomDrills(){
+    var map = loadCustomDrills();
+    var list = $("customList");
+    list.innerHTML = "";
+    var any = false;
+
+    CATEGORY_ORDER.forEach(function(key){
+      (map[key] || []).forEach(function(d, idx){
+        any = true;
+        var row = document.createElement("div");
+        row.className = "custom-drill-row";
+        var info = document.createElement("div");
+        info.className = "cd-info";
+        var cat = document.createElement("div");
+        cat.className = "cd-cat";
+        cat.textContent = CATEGORY_LABEL[key].replace("&amp;","&");
+        var nm = document.createElement("div");
+        nm.className = "cd-name";
+        nm.textContent = d.name + " · " + Math.round(d.sec/60) + " min";
+        info.appendChild(cat);
+        info.appendChild(nm);
+        if(d.cue && d.cue !== "Your own drill."){
+          var cue = document.createElement("div");
+          cue.className = "cd-cue";
+          cue.textContent = d.cue;
+          info.appendChild(cue);
+        }
+        var rm = document.createElement("button");
+        rm.className = "cd-remove";
+        rm.textContent = "×";
+        rm.setAttribute("aria-label", "Remove " + d.name);
+        rm.addEventListener("click", function(){
+          removeCustomDrill(key, idx);
+          renderCustomDrills();
+        });
+        row.appendChild(info);
+        row.appendChild(rm);
+        list.appendChild(row);
+      });
+    });
+
+    if(!any){
+      var empty = document.createElement("p");
+      empty.className = "history-empty";
+      empty.textContent = "No custom drills yet — add one above and it'll be mixed into that focus area's generator.";
+      list.appendChild(empty);
+    }
+  }
+
+  /* ============ PLAN GENERATION ============ */
+  function generatePlan(){
+    var totalSec = state.duration * 60;
+    var rest = state.restSeconds;
+    var warmupSec = state.skipWarmup ? 0 : (state.duration >= 30 ? 150 : (state.duration >= 20 ? 90 : 45));
+    var cooldownSec = state.skipCooldown ? 0 : (state.duration >= 45 ? 120 : (state.duration >= 20 ? 60 : 30));
+    var finisherCfg = (state.duration >= 20) ? FINISHER_BY_LEVEL[state.level] : null;
+    var finisherSec = finisherCfg ? (finisherCfg.work * finisherCfg.count + rest * Math.max(0, finisherCfg.count - 1)) : 0;
+    var mainSec = Math.max(totalSec - warmupSec - cooldownSec - finisherSec, 60 * state.focus.length);
+
+    var blocks = [];
+    var customDrills = loadCustomDrills();
+    var lastDrills = loadLastDrills();
+    var newLastDrills = {};
+
+    // Warmup block (skippable)
+    if(!state.skipWarmup){
+      var warmupDrills = pick(DRILLS.warmup, 1).map(function(d){
+        return {name:d.name, cue:d.cue, sec: warmupSec};
+      });
+      blocks.push({key:"warmup", label:"Warm-up", items: warmupDrills});
+    }
+
+    // Main focus blocks
+    var perCategorySec = Math.floor(mainSec / state.focus.length);
+    state.focus.slice().sort(function(a,b){
+      return CATEGORY_ORDER.indexOf(a) - CATEGORY_ORDER.indexOf(b);
+    }).forEach(function(key){
+      var avoidNames = lastDrills[key] || [];
+      var basePool = filterBySpace(excludingRecent(DRILLS[key].concat(customDrills[key] || []), avoidNames));
+      var elitePool = filterBySpace(ELITE_DRILLS[key] || []);
+      var numDrills = perCategorySec >= 8*60 ? 3 : (perCategorySec >= 4*60 ? 2 : 1);
+      numDrills = Math.min(numDrills, basePool.length + elitePool.length);
+
+      var chosen;
+      if(state.level === "elite" && elitePool.length){
+        // guarantee at least one elite-exclusive drill in every focus block
+        var guaranteed = pick(excludingRecent(elitePool, avoidNames), 1);
+        var remainingPool = basePool.concat(elitePool.filter(function(d){ return d !== guaranteed[0]; }));
+        chosen = guaranteed.concat(pick(remainingPool, Math.max(0, numDrills - 1)));
+      } else {
+        chosen = pick(basePool, numDrills);
+      }
+
+      newLastDrills[key] = chosen.map(function(d){ return d.name; });
+
+      var workSecEach = Math.max(45, Math.floor((perCategorySec - rest*(numDrills-1)) / numDrills));
+      var items = chosen.map(function(d){
+        return {name:d.name, cue:d.cue, sec: workSecEach, elite: !!d.elite, reps: !!d.reps, target: d.target, zones: d.zones};
+      });
+      blocks.push({key:key, label: CATEGORY_LABEL[key].replace("&amp;","&"), items: items, rest: rest});
+    });
+
+    var mergedLastDrills = {};
+    Object.keys(lastDrills).forEach(function(k){ mergedLastDrills[k] = lastDrills[k]; });
+    Object.keys(newLastDrills).forEach(function(k){ mergedLastDrills[k] = newLastDrills[k]; });
+    saveLastDrills(mergedLastDrills);
+
+    // Finisher block (advanced / elite only, sessions 20 min or longer).
+    // Elite draws from an exclusive, harder finisher pool instead of the shared conditioning list.
+    if(finisherCfg){
+      var finisherPool = filterBySpace(state.level === "elite" ? ELITE_FINISHERS : DRILLS.conditioning);
+      var finisherDrills = pick(finisherPool, finisherCfg.count).map(function(d){
+        return {name:d.name, cue:d.cue, sec: finisherCfg.work, elite: !!d.elite};
+      });
+      blocks.push({key:"finisher", label:"Finisher", items: finisherDrills, rest: rest});
+    }
+
+    // Cooldown block (skippable)
+    if(!state.skipCooldown){
+      var cooldownDrills = pick(DRILLS.cooldown, 1).map(function(d){
+        return {name:d.name, cue:d.cue, sec: cooldownSec};
+      });
+      blocks.push({key:"cooldown", label:"Cool-down", items: cooldownDrills});
+    }
+
+    var actualTotal = 0;
+    blocks.forEach(function(b){ actualTotal += blockSeconds(b); });
+
+    state.plan = {
+      blocks: blocks,
+      totalSec: actualTotal,
+      focusList: state.focus.slice(),
+      level: state.level,
+      duration: state.duration
+    };
+
+    buildSequence();
+    renderPlan();
+  }
+
+  function buildSequence(){
+    var seq = [];
+    var rest = state.restSeconds;
+    state.plan.blocks.forEach(function(block){
+      block.items.forEach(function(item, i){
+        var type = block.key === "warmup" ? "warmup" : (block.key === "cooldown" ? "cooldown" : "work");
+        seq.push({type:type, name:item.name, cue:item.cue, sec:item.sec, blockLabel:block.label, elite: !!item.elite, reps: !!item.reps, target:item.target, zones:item.zones});
+        var isLastItemInBlock = (i === block.items.length - 1);
+        if(type === "work" && !isLastItemInBlock){
+          seq.push({type:"rest", name:"Rest", cue:"Shake it out, sip water, get ready to go again.", sec: rest, blockLabel:block.label});
+        }
+      });
+      // short rest between blocks (not after cooldown, not before first block)
+      var blockIdx = state.plan.blocks.indexOf(block);
+      var isLastBlock = blockIdx === state.plan.blocks.length - 1;
+      if(!isLastBlock && block.key !== "warmup"){
+        seq.push({type:"rest", name:"Rest", cue:"Water break — next block coming up.", sec: rest, blockLabel:block.label});
+      } else if(block.key === "warmup"){
+        seq.push({type:"rest", name:"Rest", cue:"Grab water, then straight into work.", sec: rest, blockLabel:block.label});
+      }
+    });
+    state.sequence = seq;
+  }
+
+  /* ============ RENDER PLAN ============ */
+  function renderPlan(){
+    var planSection = $("planSection");
+    planSection.hidden = false;
+    $("planTotal").textContent = fmtMinLabel(state.plan.totalSec);
+    $("planFocusSummary").textContent = state.plan.focusList.map(function(k){ return CATEGORY_LABEL[k].replace("&amp;","&"); }).join(" · ") + " · " + LEVEL_LABEL[state.plan.level];
+
+    var container = $("planBlocks");
+    container.innerHTML = "";
+    state.plan.blocks.forEach(function(block){
+      var blockSec = blockSeconds(block);
+      var group = document.createElement("div");
+      group.className = "block-group";
+
+      var head = document.createElement("div");
+      head.className = "block-head";
+      var h3 = document.createElement("h3");
+      h3.textContent = block.label;
+      var time = document.createElement("span");
+      time.className = "block-time mono";
+      time.textContent = fmtMinLabel(blockSec);
+      head.appendChild(h3);
+      head.appendChild(time);
+      group.appendChild(head);
+
+      block.items.forEach(function(item, i){
+        var row = document.createElement("div");
+        row.className = "drill-row";
+        var dur = document.createElement("div");
+        dur.className = "dur mono";
+        dur.textContent = fmtClock(item.sec);
+        var info = document.createElement("div");
+        info.className = "info";
+        var name = document.createElement("div");
+        name.className = "name";
+        name.textContent = item.name;
+        if(item.elite){
+          var badge = document.createElement("span");
+          badge.className = "elite-badge";
+          badge.textContent = "Elite";
+          name.appendChild(badge);
+        }
+        var cue = document.createElement("div");
+        cue.className = "cue";
+        cue.textContent = item.cue + (item.reps ? " Target: " + item.target + " makes." : "");
+        info.appendChild(name);
+        info.appendChild(cue);
+        row.appendChild(dur);
+        row.appendChild(info);
+        group.appendChild(row);
+
+        if(block.rest && i < block.items.length - 1){
+          var restRow = document.createElement("div");
+          restRow.className = "drill-row rest";
+          var rdur = document.createElement("div");
+          rdur.className = "dur mono";
+          rdur.textContent = fmtClock(block.rest);
+          var rinfo = document.createElement("div");
+          rinfo.className = "info";
+          var rname = document.createElement("div");
+          rname.className = "name";
+          rname.textContent = "Rest";
+          rinfo.appendChild(rname);
+          restRow.appendChild(rdur);
+          restRow.appendChild(rinfo);
+          group.appendChild(restRow);
+        }
+      });
+
+      container.appendChild(group);
+    });
+
+    planSection.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  /* ============ AUDIO CUES ============ */
+  var audioCtx = null;
+  function beep(freq, dur, delay){
+    try{
+      if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      var t0 = audioCtx.currentTime + (delay||0);
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.frequency.value = freq;
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.28, t0+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t0);
+      osc.stop(t0+dur+0.02);
+    }catch(e){ /* audio not available; fail silently */ }
+  }
+  function cueCountdown(){ beep(880, 0.12); }
+  function cueTransition(){ beep(520,0.16); beep(760,0.18,0.18); }
+  function cueFinish(){ beep(660,0.16); beep(880,0.16,0.18); beep(1100,0.22,0.36); }
+
+  /* ============ PLAYER ============ */
+  // Rep drills and every rest break run as an open stopwatch: no auto-advance,
+  // you move on by hand (Done / Continue) whenever you're actually ready.
+  function isOpenEnded(seg){
+    return !!(seg.reps || seg.type === "rest");
+  }
+
+  function startSession(){
+    if(!state.sequence || !state.sequence.length) return;
+    var first = state.sequence[0];
+    state.player = {
+      idx:0,
+      remaining: isOpenEnded(first) ? 0 : first.sec,
+      running:true,
+      timerId:null,
+      completedWork:0,
+      totalWork: state.sequence.filter(function(s){return s.type==="work";}).length,
+      repCount:0,
+      totalReps:0,
+      zoneCounts:{},
+      sessionZoneTotals:{},
+      lastZone:null
+    };
+    $("player").hidden = false;
+    renderSegment();
+    tick(true);
+  }
+
+  function totalPlannedSec(){
+    return state.sequence.reduce(function(s,it){ return s+it.sec; }, 0);
+  }
+  function elapsedSecAtStartOfIdx(idx){
+    var s = 0;
+    for(var i=0;i<idx;i++){ s += state.sequence[i].sec; }
+    return s;
+  }
+
+  function renderSegment(){
+    var seg = state.sequence[state.player.idx];
+    $("segLabel").textContent = "Segment " + (state.player.idx+1) + " / " + state.sequence.length + " · " + seg.blockLabel;
+    var kindEl = $("kindLabel");
+    if(seg.type === "rest"){
+      kindEl.textContent = "REST";
+      kindEl.className = "kind rest";
+    } else if(seg.type === "warmup"){
+      kindEl.textContent = "WARM-UP";
+      kindEl.className = "kind";
+    } else if(seg.type === "cooldown"){
+      kindEl.textContent = "COOL-DOWN";
+      kindEl.className = "kind";
+    } else {
+      kindEl.textContent = "WORK";
+      kindEl.className = "kind";
+    }
+    $("drillName").textContent = seg.name;
+    if(seg.elite){
+      var segBadge = document.createElement("span");
+      segBadge.className = "elite-badge";
+      segBadge.textContent = "Elite";
+      $("drillName").appendChild(segBadge);
+    }
+    $("cueText").textContent = seg.cue || "";
+    $("clock").textContent = fmtClock(state.player.remaining);
+
+    var repWrap = $("repCounter");
+    var zoneWrap = $("repZones");
+    if(seg.reps && seg.zones && seg.zones.length){
+      repWrap.hidden = true;
+      zoneWrap.hidden = false;
+      renderZoneButtons(seg.zones);
+      $("repTarget").textContent = "Target: " + seg.target + " makes";
+    } else if(seg.reps){
+      repWrap.hidden = false;
+      zoneWrap.hidden = true;
+      $("repTally").textContent = state.player.repCount || 0;
+      $("repTarget").textContent = "Target: " + seg.target + " makes";
+    } else {
+      repWrap.hidden = true;
+      zoneWrap.hidden = true;
+      $("repTarget").textContent = "";
+    }
+    if(seg.reps){ $("skipFwdBtn").textContent = "Done ✓"; }
+    else if(seg.type === "rest"){ $("skipFwdBtn").textContent = "Continue →"; }
+    else { $("skipFwdBtn").textContent = "Skip →"; }
+    $("ffBtn").hidden = isOpenEnded(seg);
+
+    var next = state.sequence[state.player.idx+1];
+    $("nextText").textContent = next ? ("Up next: " + next.name) : "Last segment — finish strong.";
+
+    if(isOpenEnded(seg)){
+      $("progressBar").style.width = (elapsedSecAtStartOfIdx(state.player.idx) / totalPlannedSec() * 100) + "%";
+    } else {
+      var elapsedBefore = elapsedSecAtStartOfIdx(state.player.idx);
+      var doneInSeg = seg.sec - state.player.remaining;
+      var pct = Math.min(100, ((elapsedBefore + doneInSeg) / totalPlannedSec()) * 100);
+      $("progressBar").style.width = pct + "%";
+    }
+  }
+
+  // Zone-mode make tracking (Spot-up catch-and-shoot etc.): one button per shot
+  // spot, each with its own tally, feeding the same overall repCount as the
+  // plain +/- counter does for drills without zones.
+  function renderZoneButtons(zones){
+    var grid = $("zoneGrid");
+    grid.innerHTML = "";
+    zones.forEach(function(z){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "zone-btn";
+      var lbl = document.createElement("span");
+      lbl.textContent = z;
+      var cnt = document.createElement("span");
+      cnt.className = "zc mono";
+      cnt.textContent = state.player.zoneCounts[z] || 0;
+      btn.appendChild(lbl);
+      btn.appendChild(cnt);
+      btn.setAttribute("aria-label", "Add a make from " + z);
+      btn.addEventListener("click", function(){
+        state.player.zoneCounts[z] = (state.player.zoneCounts[z] || 0) + 1;
+        state.player.repCount = (state.player.repCount || 0) + 1;
+        state.player.lastZone = z;
+        cnt.textContent = state.player.zoneCounts[z];
+        $("repZonesTotal").textContent = state.player.repCount;
+      });
+      grid.appendChild(btn);
+    });
+    $("repZonesTotal").textContent = state.player.repCount || 0;
+  }
+
+  function tick(skipDecrement){
+    clearTimeout(state.player.timerId);
+    if(!state.player.running) return;
+    var seg = state.sequence[state.player.idx];
+
+    // Rep-based drills and rest breaks run as an open stopwatch — no auto-advance;
+    // the player moves on manually (Done / Continue) once actually ready.
+    if(isOpenEnded(seg)){
+      if(!skipDecrement){ state.player.remaining += 1; }
+      $("clock").textContent = fmtClock(state.player.remaining);
+      state.player.timerId = setTimeout(function(){ tick(false); }, 1000);
+      return;
+    }
+
+    if(!skipDecrement){
+      state.player.remaining -= 1;
+    }
+    $("clock").textContent = fmtClock(Math.max(0,state.player.remaining));
+    var elapsedBefore = elapsedSecAtStartOfIdx(state.player.idx);
+    var doneInSeg = seg.sec - state.player.remaining;
+    var pct = Math.min(100, ((elapsedBefore + doneInSeg) / totalPlannedSec()) * 100);
+    $("progressBar").style.width = pct + "%";
+
+    if(state.player.remaining <= 3 && state.player.remaining > 0){
+      cueCountdown();
+    }
+
+    if(state.player.remaining <= 0){
+      if(seg.type === "work") state.player.completedWork += 1;
+      advanceSegment();
+      return;
+    }
+    state.player.timerId = setTimeout(function(){ tick(false); }, 1000);
+  }
+
+  function advanceSegment(manual){
+    var seg = state.sequence[state.player.idx];
+    if(seg.reps && seg.type === "work"){
+      // rep-based drills only ever complete when marked "Done" — credit them here
+      state.player.completedWork += 1;
+      state.player.totalReps = (state.player.totalReps || 0) + (state.player.repCount || 0);
+      if(seg.zones && state.player.zoneCounts){
+        var totals = state.player.sessionZoneTotals || {};
+        Object.keys(state.player.zoneCounts).forEach(function(z){
+          totals[z] = (totals[z] || 0) + state.player.zoneCounts[z];
+        });
+        state.player.sessionZoneTotals = totals;
+      }
+    }
+
+    var wasLast = state.player.idx >= state.sequence.length - 1;
+    if(wasLast){
+      cueFinish();
+      finishSession(true);
+      return;
+    }
+    if(!manual) cueTransition();
+    state.player.idx += 1;
+    var nextSeg = state.sequence[state.player.idx];
+    state.player.remaining = isOpenEnded(nextSeg) ? 0 : nextSeg.sec;
+    state.player.repCount = 0;
+    state.player.zoneCounts = {};
+    state.player.lastZone = null;
+    renderSegment();
+    if(state.player.running){
+      state.player.timerId = setTimeout(function(){ tick(false); }, 1000);
+    }
+  }
+
+  function goBack(){
+    if(state.player.idx === 0){
+      var first = state.sequence[0];
+      state.player.remaining = isOpenEnded(first) ? 0 : first.sec;
+    } else {
+      state.player.idx -= 1;
+      var seg = state.sequence[state.player.idx];
+      state.player.remaining = isOpenEnded(seg) ? 0 : seg.sec;
+    }
+    state.player.repCount = 0;
+    state.player.zoneCounts = {};
+    state.player.lastZone = null;
+    renderSegment();
+  }
+
+  function togglePause(){
+    state.player.running = !state.player.running;
+    $("pauseBtn").textContent = state.player.running ? "Pause" : "Resume";
+    if(state.player.running){
+      state.player.timerId = setTimeout(function(){ tick(false); }, 1000);
+    } else {
+      clearTimeout(state.player.timerId);
+    }
+  }
+
+  function closePlayer(finished){
+    clearTimeout(state.player.timerId);
+    $("player").hidden = true;
+    if(!finished){
+      finishSession(false);
+    }
+  }
+
+  function finishSession(fullyCompleted){
+    clearTimeout(state.player.timerId);
+    $("player").hidden = true;
+    var totalWork = state.player.totalWork || 1;
+    var completed = state.player.completedWork;
+
+    var categoryMinutes = {};
+    state.plan.blocks.forEach(function(b){
+      if(CATEGORY_ORDER.indexOf(b.key) > -1){
+        categoryMinutes[b.key] = Math.round(blockSeconds(b) / 60);
+      }
+    });
+
+    var session = {
+      date: new Date().toISOString(),
+      durationPlannedMin: state.plan.duration,
+      focus: state.plan.focusList.slice(),
+      level: state.plan.level,
+      completedDrills: completed,
+      totalDrills: totalWork,
+      finished: fullyCompleted && completed >= totalWork,
+      categoryMinutes: categoryMinutes
+    };
+    if(state.player.totalReps){ session.totalReps = state.player.totalReps; }
+    if(state.player.sessionZoneTotals && Object.keys(state.player.sessionZoneTotals).length){
+      session.zoneBreakdown = state.player.sessionZoneTotals;
+    }
+    saveSession(session);
+    renderHistory();
+    $("historySection").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  /* ============ HISTORY / STORAGE ============ */
+  function loadSessions(){
+    try{
+      var raw = localStorage.getItem(nsKey(STORAGE_KEY));
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveSession(session){
+    try{
+      var list = loadSessions();
+      list.unshift(session);
+      localStorage.setItem(nsKey(STORAGE_KEY), JSON.stringify(list.slice(0,200)));
+    }catch(e){ /* storage unavailable, continue without persisting */ }
+  }
+  function clearSessions(){
+    try{ localStorage.removeItem(nsKey(STORAGE_KEY)); }catch(e){}
+    renderHistory();
+  }
+
+  function computeStreak(sessions){
+    if(!sessions.length) return 0;
+    var days = {};
+    sessions.forEach(function(s){
+      var d = new Date(s.date);
+      var key = d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
+      days[key] = true;
+    });
+    var streak = 0;
+    var cursor = new Date();
+    for(;;){
+      var key = cursor.getFullYear()+"-"+cursor.getMonth()+"-"+cursor.getDate();
+      if(days[key]){
+        streak += 1;
+        cursor.setDate(cursor.getDate()-1);
+      } else if(streak === 0){
+        // allow "today not yet logged" to not break streak check on yesterday
+        cursor.setDate(cursor.getDate()-1);
+        var key2 = cursor.getFullYear()+"-"+cursor.getMonth()+"-"+cursor.getDate();
+        if(days[key2]){ continue; }
+        break;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  // Longest run of consecutive practice days ever, not just the current one —
+  // used for streak milestone badges.
+  function computeLongestStreakEver(sessions){
+    if(!sessions.length) return 0;
+    var days = {};
+    sessions.forEach(function(s){
+      var d = new Date(s.date);
+      var key = d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
+      days[key] = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    });
+    var times = Object.keys(days).map(function(k){ return days[k]; }).sort(function(a,b){ return a-b; });
+    var longest = 1, cur = 1;
+    for(var i=1;i<times.length;i++){
+      if(times[i] - times[i-1] === 86400000){ cur += 1; } else { cur = 1; }
+      longest = Math.max(longest, cur);
+    }
+    return longest;
+  }
+
+  // Sums makes-by-zone across every logged session (zone-tracked drills only).
+  function computeZoneStats(sessions){
+    var totals = {};
+    sessions.forEach(function(s){
+      if(!s.zoneBreakdown) return;
+      Object.keys(s.zoneBreakdown).forEach(function(z){
+        totals[z] = (totals[z] || 0) + s.zoneBreakdown[z];
+      });
+    });
+    return totals;
+  }
+
+  // Highest milestone reached in each category — only the top badge per
+  // category is shown, so the row stays short as history builds up.
+  function computeBadges(sessions){
+    var badges = [];
+    function topTier(thresholds, value, mkLabel){
+      var hit = thresholds.filter(function(t){ return value >= t; });
+      if(!hit.length) return;
+      var top = hit[hit.length-1];
+      badges.push(mkLabel(top));
+    }
+    topTier([1,10,25,50,100], sessions.length, function(n){
+      return n === 1 ? "First session" : n + " sessions logged";
+    });
+    topTier([3,7,14,30], computeLongestStreakEver(sessions), function(n){
+      return n + "-day streak";
+    });
+    var totalReps = sessions.reduce(function(s,x){ return s + (x.totalReps||0); }, 0);
+    topTier([100,500,1000,2500], totalReps, function(n){
+      return n + " makes logged";
+    });
+    if(sessions.some(function(s){ return s.level === "elite"; })){
+      badges.push("Elite debut");
+    }
+    return badges;
+  }
+
+  // Full badge roster (every tier, not just the top one per category) for the
+  // dedicated Badges screen, so upcoming milestones are visible too.
+  var BADGE_DEFS = [
+    {label:"First session", check:function(m){ return m.sessions >= 1; }},
+    {label:"10 sessions logged", check:function(m){ return m.sessions >= 10; }},
+    {label:"25 sessions logged", check:function(m){ return m.sessions >= 25; }},
+    {label:"50 sessions logged", check:function(m){ return m.sessions >= 50; }},
+    {label:"100 sessions logged", check:function(m){ return m.sessions >= 100; }},
+    {label:"3-day streak", check:function(m){ return m.longestStreak >= 3; }},
+    {label:"7-day streak", check:function(m){ return m.longestStreak >= 7; }},
+    {label:"14-day streak", check:function(m){ return m.longestStreak >= 14; }},
+    {label:"30-day streak", check:function(m){ return m.longestStreak >= 30; }},
+    {label:"100 makes logged", check:function(m){ return m.totalReps >= 100; }},
+    {label:"500 makes logged", check:function(m){ return m.totalReps >= 500; }},
+    {label:"1,000 makes logged", check:function(m){ return m.totalReps >= 1000; }},
+    {label:"2,500 makes logged", check:function(m){ return m.totalReps >= 2500; }},
+    {label:"Elite debut", check:function(m){ return m.hasElite; }}
+  ];
+
+  function computeBadgeMetrics(sessions){
+    return {
+      sessions: sessions.length,
+      longestStreak: computeLongestStreakEver(sessions),
+      totalReps: sessions.reduce(function(s,x){ return s + (x.totalReps||0); }, 0),
+      hasElite: sessions.some(function(s){ return s.level === "elite"; })
+    };
+  }
+
+  function renderBadgesScreen(){
+    var sessions = loadSessions();
+    var metrics = computeBadgeMetrics(sessions);
+    var grid = $("badgesGrid");
+    grid.innerHTML = "";
+    BADGE_DEFS.forEach(function(def){
+      var earned = def.check(metrics);
+      var tile = document.createElement("div");
+      tile.className = "badge-tile" + (earned ? " earned" : "");
+      var check = document.createElement("span");
+      check.className = "bt-check";
+      check.textContent = earned ? "EARNED" : "LOCKED";
+      var lbl = document.createElement("span");
+      lbl.textContent = def.label;
+      tile.appendChild(check);
+      tile.appendChild(lbl);
+      grid.appendChild(tile);
+    });
+  }
+
+  function renderHistory(){
+    var sessions = loadSessions();
+    var body = $("historyBody");
+    body.innerHTML = "";
+
+    if(!sessions.length){
+      var empty = document.createElement("p");
+      empty.className = "history-empty";
+      empty.textContent = "No sessions logged yet — generate a workout above and hit Start to begin your log.";
+      body.appendChild(empty);
+      return;
+    }
+
+    var streakRow = document.createElement("div");
+    streakRow.className = "streak-row";
+    var totalMinutes = sessions.reduce(function(s,x){ return s + (x.durationPlannedMin||0); },0);
+    var stats = [
+      {num: sessions.length, lbl: "Sessions logged"},
+      {num: computeStreak(sessions), lbl: "Day streak"},
+      {num: totalMinutes, lbl: "Total minutes"}
+    ];
+    stats.forEach(function(s){
+      var el = document.createElement("div");
+      el.className = "stat";
+      var num = document.createElement("div");
+      num.className = "num mono";
+      num.textContent = s.num;
+      var lbl = document.createElement("div");
+      lbl.className = "lbl";
+      lbl.textContent = s.lbl;
+      el.appendChild(num);
+      el.appendChild(lbl);
+      streakRow.appendChild(el);
+    });
+    body.appendChild(streakRow);
+
+    var badges = computeBadges(sessions);
+    if(badges.length){
+      var badgeRow = document.createElement("div");
+      badgeRow.className = "badge-row";
+      badges.forEach(function(label){
+        var pill = document.createElement("span");
+        pill.className = "badge-pill";
+        pill.textContent = label;
+        badgeRow.appendChild(pill);
+      });
+      body.appendChild(badgeRow);
+    }
+
+    var catStats = computeCategoryStats(sessions);
+    var maxMin = 1;
+    CATEGORY_ORDER.forEach(function(k){ maxMin = Math.max(maxMin, catStats[k].totalMin); });
+    var barsWrap = document.createElement("div");
+    barsWrap.className = "category-bars";
+    var barsLegend = document.createElement("div");
+    barsLegend.className = "bars-legend";
+    barsLegend.textContent = "By focus area";
+    barsWrap.appendChild(barsLegend);
+    CATEGORY_ORDER.forEach(function(k){
+      var min = catStats[k].totalMin;
+      var row = document.createElement("div");
+      row.className = "bar-row";
+      var lbl = document.createElement("span");
+      lbl.className = "bar-label";
+      lbl.textContent = CATEGORY_LABEL[k].replace("&amp;","&");
+      var track = document.createElement("div");
+      track.className = "bar-track";
+      var fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.width = (min / maxMin * 100) + "%";
+      track.appendChild(fill);
+      var val = document.createElement("span");
+      val.className = "bar-value mono";
+      val.textContent = min + " min";
+      row.appendChild(lbl);
+      row.appendChild(track);
+      row.appendChild(val);
+      barsWrap.appendChild(row);
+    });
+    body.appendChild(barsWrap);
+
+    var zoneStats = computeZoneStats(sessions);
+    var zoneKeys = Object.keys(zoneStats);
+    if(zoneKeys.length){
+      var maxZone = 1;
+      zoneKeys.forEach(function(z){ maxZone = Math.max(maxZone, zoneStats[z]); });
+      var zoneWrap = document.createElement("div");
+      zoneWrap.className = "category-bars";
+      var zoneLegend = document.createElement("div");
+      zoneLegend.className = "bars-legend";
+      zoneLegend.textContent = "Shot zones (makes)";
+      zoneWrap.appendChild(zoneLegend);
+      zoneKeys.sort(function(a,b){ return zoneStats[b] - zoneStats[a]; }).forEach(function(z){
+        var row = document.createElement("div");
+        row.className = "bar-row";
+        var lbl = document.createElement("span");
+        lbl.className = "bar-label";
+        lbl.textContent = z;
+        var track = document.createElement("div");
+        track.className = "bar-track";
+        var fill = document.createElement("div");
+        fill.className = "bar-fill";
+        fill.style.width = (zoneStats[z] / maxZone * 100) + "%";
+        track.appendChild(fill);
+        var val = document.createElement("span");
+        val.className = "bar-value mono";
+        val.textContent = zoneStats[z];
+        row.appendChild(lbl);
+        row.appendChild(track);
+        row.appendChild(val);
+        zoneWrap.appendChild(row);
+      });
+      body.appendChild(zoneWrap);
+    }
+
+    sessions.slice(0,10).forEach(function(s){
+      var row = document.createElement("div");
+      row.className = "log-row";
+      var d = new Date(s.date);
+      var dateEl = document.createElement("div");
+      dateEl.className = "ldate";
+      dateEl.textContent = d.toLocaleDateString(undefined, {month:"short", day:"numeric"});
+      var focusEl = document.createElement("div");
+      focusEl.className = "lfocus";
+      focusEl.textContent = (s.focus||[]).map(function(k){ return CATEGORY_LABEL[k] ? CATEGORY_LABEL[k].replace("&amp;","&") : k; }).join(", ") + " · " + LEVEL_LABEL[s.level];
+      var metaEl = document.createElement("div");
+      metaEl.className = "lmeta";
+      var statusSpan = document.createElement("span");
+      statusSpan.className = s.finished ? "done" : "partial";
+      statusSpan.textContent = s.finished ? "Completed" : (s.completedDrills+"/"+s.totalDrills+" drills");
+      metaEl.appendChild(document.createTextNode(s.durationPlannedMin+" min · "));
+      metaEl.appendChild(statusSpan);
+      if(s.totalReps){
+        metaEl.appendChild(document.createTextNode(" · " + s.totalReps + " makes"));
+      }
+      row.appendChild(dateEl);
+      row.appendChild(focusEl);
+      row.appendChild(metaEl);
+      body.appendChild(row);
+    });
+
+    var clearWrap = document.createElement("div");
+    clearWrap.className = "clear-log";
+
+    var clearBtn = document.createElement("button");
+    clearBtn.className = "btn ghost";
+    clearBtn.textContent = "Clear log";
+
+    var confirmRow = document.createElement("div");
+    confirmRow.className = "clear-confirm-row";
+    confirmRow.hidden = true;
+    var confirmText = document.createElement("span");
+    confirmText.className = "clear-confirm-text";
+    confirmText.textContent = "Clear all logged sessions? This can't be undone.";
+    var confirmYes = document.createElement("button");
+    confirmYes.className = "btn ghost warn-btn";
+    confirmYes.textContent = "Yes, clear it";
+    var confirmNo = document.createElement("button");
+    confirmNo.className = "btn ghost";
+    confirmNo.textContent = "Cancel";
+    confirmRow.appendChild(confirmText);
+    confirmRow.appendChild(confirmYes);
+    confirmRow.appendChild(confirmNo);
+
+    clearBtn.addEventListener("click", function(){
+      clearBtn.hidden = true;
+      confirmRow.hidden = false;
+    });
+    confirmNo.addEventListener("click", function(){
+      confirmRow.hidden = true;
+      clearBtn.hidden = false;
+    });
+    confirmYes.addEventListener("click", function(){
+      clearSessions();
+    });
+
+    clearWrap.appendChild(clearBtn);
+    clearWrap.appendChild(confirmRow);
+    body.appendChild(clearWrap);
+  }
+
+  /* ============ WIRE UP ============ */
+  function init(){
+    ensureProfiles();
+    renderProfileBar();
+    buildChips();
+    renderHistory();
+    populateCustomCategorySelect();
+    renderCustomDrills();
+
+    $("switchProfileBtn").addEventListener("click", function(){
+      renderProfileGrid();
+      $("addProfileForm").hidden = true;
+      $("appBody").hidden = true;
+      $("profileScreen").hidden = false;
+      $("profileScreen").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+    $("closeProfileScreenBtn").addEventListener("click", function(){
+      $("profileScreen").hidden = true;
+      $("appBody").hidden = false;
+    });
+    $("showBadgesBtn").addEventListener("click", function(){
+      renderBadgesScreen();
+      $("badgesSection").hidden = false;
+      $("badgesSection").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+    $("closeBadgesBtn").addEventListener("click", function(){
+      $("badgesSection").hidden = true;
+    });
+    $("createProfileBtn").addEventListener("click", function(){
+      var name = $("newProfileName").value.trim();
+      if(!name){ $("newProfileName").focus(); return; }
+      var id = addProfile(name);
+      switchToProfile(id);
+    });
+    $("cancelProfileBtn").addEventListener("click", function(){
+      $("addProfileForm").hidden = true;
+    });
+    $("newProfileName").addEventListener("keydown", function(e){
+      if(e.key === "Enter"){ e.preventDefault(); $("createProfileBtn").click(); }
+    });
+
+    $("generateBtn").addEventListener("click", generatePlan);
+    $("regenBtn").addEventListener("click", generatePlan);
+    $("startBtn").addEventListener("click", startSession);
+    $("dismissPlanBtn").addEventListener("click", function(){ $("planSection").hidden = true; });
+    $("closePlayer").addEventListener("click", function(){ closePlayer(false); });
+    $("pauseBtn").addEventListener("click", togglePause);
+    $("skipFwdBtn").addEventListener("click", function(){ advanceSegment(true); });
+    $("skipBackBtn").addEventListener("click", goBack);
+    $("ffBtn").addEventListener("click", function(){
+      var seg = state.sequence[state.player.idx];
+      if(isOpenEnded(seg)) return; // nothing to fast-forward on an open-ended break/rep drill
+      state.player.remaining = Math.max(0, state.player.remaining - 10);
+      $("clock").textContent = fmtClock(state.player.remaining);
+      if(state.player.remaining <= 0){
+        if(seg.type === "work") state.player.completedWork += 1;
+        advanceSegment();
+      }
+    });
+    $("repPlusBtn").addEventListener("click", function(){
+      state.player.repCount = (state.player.repCount || 0) + 1;
+      $("repTally").textContent = state.player.repCount;
+    });
+    $("repMinusBtn").addEventListener("click", function(){
+      state.player.repCount = Math.max(0, (state.player.repCount || 0) - 1);
+      $("repTally").textContent = state.player.repCount;
+    });
+    $("zoneUndoBtn").addEventListener("click", function(){
+      var z = state.player.lastZone;
+      if(!z || !state.player.zoneCounts[z]) return;
+      state.player.zoneCounts[z] -= 1;
+      state.player.repCount = Math.max(0, (state.player.repCount || 0) - 1);
+      var seg = state.sequence[state.player.idx];
+      if(seg && seg.zones){ renderZoneButtons(seg.zones); }
+    });
+
+    $("addCustomBtn").addEventListener("click", function(){
+      var cat = $("customCategory").value;
+      var name = $("customName").value.trim();
+      var cue = $("customCue").value.trim();
+      var mins = parseFloat($("customMinutes").value) || 2;
+      if(!name){ $("customName").focus(); return; }
+      addCustomDrill(cat, name, cue, Math.max(30, Math.round(mins * 60)));
+      $("customName").value = "";
+      $("customCue").value = "";
+      renderCustomDrills();
+    });
+
+    document.addEventListener("keydown", function(e){
+      if($("player").hidden) return;
+      if(e.key === " "){ e.preventDefault(); togglePause(); }
+      if(e.key === "ArrowRight"){ advanceSegment(true); }
+      if(e.key === "ArrowLeft"){ goBack(); }
+      if(e.key === "Escape"){ closePlayer(false); }
+    });
+  }
+
+  init();
+})();
+</script>
